@@ -1,29 +1,46 @@
-<Project Sdk="Microsoft.NET.Sdk">
+module DictionaryCore
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-	  <TargetFramework>net9.0-windows</TargetFramework>
-	  <UseWindowsForms>true</UseWindowsForms>
-	  <GenerateProgramFile>false</GenerateProgramFile>
-  </PropertyGroup>
+open System
 
-  <ItemGroup>
-    <Compile Include="DictionaryCore.fs" />
-    <Compile Include="JsonStorage.fs" />
-    <Compile Include="Gui.fs" />
-    <Compile Include="Tests\DictionaryCoreTests.fs" />
-    <Compile Include="Tests\JsonStorageTests.fs" />
-    <Compile Include="Program.fs" />
-  </ItemGroup>
+type Dictionary = Map<string,string>
 
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-	<PackageReference Include="FsCheck" Version="2.16.5" />
-	<PackageReference Include="FsCheck.Xunit" Version="2.16.5" />
-	<PackageReference Include="xunit" Version="2.4.2" />
-	<PackageReference Include="xunit.runner.visualstudio" Version="2.4.5" />
-	<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />
-	<PackageReference Include="FsUnit.xUnit" Version="5.1.0" />
-  </ItemGroup>
+let normalize (w:string) =
+    w.Trim().ToLower()
 
-</Project>
+let addWord word definition (dict:Dictionary) =
+    let key = normalize word
+    if key = "" then Error "Word cannot be empty"
+    elif dict |> Map.containsKey key then Error "Word already exists"
+    else Ok (dict |> Map.add key definition)
+
+let updateWord word definition (dict:Dictionary) =
+    let key = normalize word
+    if dict |> Map.containsKey key then
+        Ok (dict |> Map.add key definition)
+    else
+        Error "Word not found"
+
+let deleteWord word (dict:Dictionary) =
+    let key = normalize word
+    if dict |> Map.containsKey key then
+        Ok (dict |> Map.remove key)
+    else
+        Error "Word not found"
+
+let findExact word (dict:Dictionary) =
+    let key = normalize word
+    dict |> Map.tryFind key
+
+let searchPartial (part: string) (dict: Dictionary) =
+    let searchTerm = normalize part
+    
+    if searchTerm = "" then
+        dict |> Map.toList |> List.sortBy fst
+    else
+        dict
+        |> Map.toList
+        |> List.filter (fun (key, _) -> key.Contains(searchTerm))
+        |> List.sortBy (fun (key, _) ->
+            let isPrefix = key.StartsWith(searchTerm)
+            (if isPrefix then 0 else 1), key  // 0 = prefix, 1 = contains only
+        )
