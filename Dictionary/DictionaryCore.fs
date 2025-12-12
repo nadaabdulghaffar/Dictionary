@@ -31,8 +31,16 @@ let findExact word (dict:Dictionary) =
     let key = normalize word
     dict |> Map.tryFind key
 
-let searchPartial (part:string) (dict:Dictionary) =
-    let p = normalize part
-    dict
-    |> Map.toList
-    |> List.filter (fun (w,_) -> w.Contains(p))
+let searchPartial (part: string) (dict: Dictionary) =
+    let searchTerm = normalize part
+    
+    if searchTerm = "" then
+        dict |> Map.toList |> List.sortBy fst
+    else
+        dict
+        |> Map.toList
+        |> List.filter (fun (key, _) -> key.Contains(searchTerm))
+        |> List.sortBy (fun (key, _) ->
+            let isPrefix = key.StartsWith(searchTerm)
+            (if isPrefix then 0 else 1), key  // 0 = prefix, 1 = contains only
+        )
