@@ -20,3 +20,23 @@ To run this project, you must have the following installed on your system:
 git clone https://github.com/nadaabdulghaffar/Dictionary.git
 
 ```
+2. Change into the project directory
+```bash
+cd Dictionary
+cd Dictionary
+
+```
+3. Restore dependencies
+```bash
+dotnet restore
+```
+4. Build the solution
+```bash
+dotnet build
+```
+5. Run the project
+```bash
+dotnet run
+```
+
+Enjoy!!! 
