@@ -12,6 +12,7 @@
     <Compile Include="JsonStorage.fs" />
     <Compile Include="Gui.fs" />
     <Compile Include="Tests\DictionaryCoreTests.fs" />
+	<Compile Include="Tests\JsonStorageTests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
